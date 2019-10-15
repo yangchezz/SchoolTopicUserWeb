@@ -322,6 +322,9 @@
             judgeAnswer += (this.questionArray[i] + "" + this.answers[i]);
           }
         }
+        if(radioAnswer === "" && multipartAnswer === "" && judgeAnswer === ""){
+          return;
+        }
         //清空答案
         this.questionArray = [];
         this.answers = [];
@@ -447,7 +450,6 @@
               this.answers.length !== this.questionArray.length) {
               return;
             }
-
             self.submitAnswer();
             window.clearInterval(self.time);
             //清除事件

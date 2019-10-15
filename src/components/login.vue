@@ -33,6 +33,7 @@
     <el-dialog
       title="答题须知"
       :visible.sync="showDialog"
+      :before-close="handleClose"
       width="90%">
       <div style="text-align: left;line-height: 30px;">
         <b>考试时间：</b>60分钟(超出时间自动提交)
@@ -123,7 +124,6 @@
             //存储token
             localStorage.setItem("token", result.data);
             //显示对话框
-            this.showDialog = true;
             let self = this;
             if (this.event != null) {
               window.clearInterval(this.event);
@@ -136,7 +136,9 @@
                 self.testWord = "我要答题";
                 window.clearInterval(self.event);
               }
-            }, 1000)
+            }, 1000);
+            //显示对话框
+            this.showDialog = true;
           } else if (result.status === 400) {
             localStorage.setItem("token", result.data);
             this.$router.push({path: '/Head/Grade'});
@@ -168,6 +170,9 @@
       },
       backIndex() {
         this.$router.push({path: '/Head/Index'});
+      },
+      handleClose(){
+        this.loading = true;
       }
     },
     created() {

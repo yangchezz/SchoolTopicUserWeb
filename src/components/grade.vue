@@ -101,7 +101,7 @@
             <el-col :md="12" :sm="12" :xs="12" class="grade_title">
               院平均时间
             </el-col>
-            <el-col :md="12" :sm="12" :xs="12" v-text="(academy.academyTimeSum / academy.academyJoinCount) +' s' " class="grade_value">
+            <el-col :md="12" :sm="12" :xs="12" v-text="(academy.academyTimeSum / academy.academyJoinCount).toFixed(6) +' s' " class="grade_value">
             </el-col>
           </el-row>
         </el-col>
@@ -150,7 +150,7 @@
             <el-col :md="12" :sm="12" :xs="12" class="grade_title">
               平均时间
             </el-col>
-            <el-col :md="12" :sm="12" :xs="12" v-text="stuClass.classTimeSum / stuClass.classJoinCount + ' s'" class="grade_value">
+            <el-col :md="12" :sm="12" :xs="12" v-text=" (stuClass.classTimeSum / stuClass.classJoinCount).toFixed(6)  + ' s'" class="grade_value">
             </el-col>
           </el-row>
           <!--分数部分-->
