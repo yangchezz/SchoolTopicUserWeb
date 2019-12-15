@@ -1,10 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Index from '@/components/index'
-import Login from '@/components/login'
 import Head from '@/components/head'
-import Grade from '@/components/grade'
-import Answer from '@/components/answer'
 
 Vue.use(Router)
 
@@ -12,36 +8,36 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect:"/Head/Index"
+      redirect: "/Head/Login"
     },
     {
-      path:'/Head',
-      redirect:"/Head/Index"
+      path: '/Head',
+      redirect: "/Head/Login"
     },
     {
-      path:"/Head",
-      name:'Head',
-      component:Head,
-      children:[
+      path: "/Head",
+      name: 'Head',
+      component: Head,
+      children: [
         {
-          path:"Login",
-          name:"Login",
-          component:Login
+          path: "Login",
+          name: "Login",
+          component: resolver => require(['@/components/login'], resolver)
         },
         {
-          path:"Index",
-          name:"Index",
-          component:Index
+          path: "Index",
+          name: "Index",
+          component: resolver => require(['@/components/index'], resolver)
         },
         {
-          path:"Answer",
-          name:'Answer',
-          component:Answer
+          path: "Answer",
+          name: 'Answer',
+          component: resolver => require(['@/components/answer'], resolver)
         },
         {
-          path:"Grade",
-          name:'Grade',
-          component:Grade
+          path: "Grade",
+          name: 'Grade',
+          component: resolver => require(['@/components/grade'], resolver)
         }
       ]
     },

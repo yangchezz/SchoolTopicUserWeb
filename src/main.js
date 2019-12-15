@@ -10,18 +10,27 @@ Vue.use(ElementUI);
 Vue.config.productionTip = false;
 
 import axios from 'axios'
-axios.defaults.baseURL = 'http://47.106.199.169:8080/Topic/';
+
+const path = 'http://172.17.3.10:80/Topic/';
+// axios.defaults.baseURL = path;
+
 // axios.defaults.withCredentials = true; // 这行不要
-// axios.defaults.baseURL="http://localhost:8080/Question/";
+axios.defaults.baseURL = path;
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
 //导入md5包
 import MD5 from 'js-md5';
+
 Vue.prototype.$MD5 = MD5;
+
+
+import URL from './util/url'
+
+Vue.prototype.$URL = URL;
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
-  components: { App },
+  components: {App},
   template: '<App/>'
 });

@@ -1,40 +1,44 @@
 <template>
   <el-row v-loading="loading">
-    <el-col :md="{span:4,offset:10}" :sm="20" :xs="20" :offset="2" class="loginDiv">
-      <el-col :md="24" :sm="24" :xs="24" class="form">
-        <el-form :label-position="'right'" :model="Student" class="form-login" align="left">
-          <div class="login-head">
-            学生登录
-          </div>
-          <el-input
-            type="text"
-            class="form-login-input"
-            placeholder="学号"
-            autofocus
-            maxlength="12"
-            v-model="Student.studentId">
-          </el-input>
-          <el-input
-            type="password"
-            class="form-login-input"
-            placeholder="登录密码"
-            maxlength="12"
-            v-model="Student.password">
-          </el-input>
-          <el-button type="info" class="index-join-game" @click="login">登录答题</el-button>
-          <div class="back_index" align="right">
-            <span @click.self="backIndex">回到首页</span>
-          </div>
-        </el-form>
+    <el-col :md="24" :sm="24" :xs="24"
+            style="background:url('http://pic1.win4000.com/wallpaper/8/54587289a518f.jpg') no-repeat 100%;background-size:cover;">
+      <el-col :md="{span:5,offset:17}" :xs="{span:20,offset:2}" :sm="{span:14,offset:10}" class="loginDiv">
+        <el-col :md="{span:22,offset:1}" :sm="{span:16,offset:4}" :xs="24" class="form">
+          <el-form :label-position="'right'" :model="Student" class="form-login">
+            <div class="login-head">
+              <img src="../../static/school.jpg" style="max-height: 80px;width:auto" alt="">
+            </div>
+            <el-input
+              type="text"
+              class="form-login-input"
+              placeholder="学号(12位)"
+              autofocus
+              maxlength="12"
+              v-model="Student.studentId">
+            </el-input>
+            <el-input
+              type="password"
+              class="form-login-input"
+              placeholder="登录密码(身份证后六位或学号)"
+              maxlength="12"
+              v-model="Student.password">
+            </el-input>
+            <el-button type="info" class="index-join-game" @click="login">登录答题</el-button>
+            <div class="back_index">
+              <!--            <span @click.self="backIndex">回到首页</span>-->
+            </div>
+          </el-form>
+        </el-col>
       </el-col>
     </el-col>
+
 
     <!--    提示对话框-->
     <el-dialog
       title="答题须知"
       :visible.sync="showDialog"
       :before-close="handleClose"
-      width="90%">
+      :width="calDialogWidth()">
       <div style="text-align: left;line-height: 30px;">
         <b>考试时间：</b>60分钟(超出时间自动提交)
         <br>
@@ -44,15 +48,11 @@
         <br>
         <br>
         <b>注意事项：</b>
-        答题过程中请勿刷新答题页面，同时不能离开答题页面进行答题，否则会自动提交答案，考试资格只有一次，祝您取得好成绩！
+        答题过程中请勿刷新答题页面，同时不能离开答题页面进行答题，否则会自动提交答案，考试资格每人两次，最后成绩以最高分为主！祝您取得好成绩！
       </div>
       <div slot="footer" class="buttons">
-        <div class="button">
-          <el-button type="warning" @click="cancelTest">取消答题</el-button>
-        </div>
-        <div class="button">
-          <el-button type="primary" @click="toTest" v-text="testWord" :disabled="clickAble"></el-button>
-        </div>
+        <el-button type="warning" @click="cancelTest">取消答题</el-button>
+        <el-button type="primary" @click="toTest" v-text="testWord" :disabled="clickAble"></el-button>
       </div>
     </el-dialog>
   </el-row>
@@ -110,18 +110,21 @@
       },
       submitForm() {
         // 发送登录请求
-        axios.post("/Student/getToken", qs.stringify({
+        axios.post(this.$URL.Login, qs.stringify({
           studentId: this.Student.studentId,
-          password: this.$MD5(this.Student.password)
+          studentPassword: this.$MD5(this.Student.password)
         })).then((success) => {
           let result = success.data;
-          console.log(result);
-          if (result.result && result.status === 200) {
+          if (result.result && result.code === 200) {
             this.$message({
               type: "success",
               message: result.message
             });
             //存储token
+            localStorage.removeItem("token");
+            localStorage.removeItem("TIME");
+            localStorage.removeItem("Answer");
+            localStorage.removeItem("SUBMIT");
             localStorage.setItem("token", result.data);
             //显示对话框
             let self = this;
@@ -139,15 +142,20 @@
             }, 1000);
             //显示对话框
             this.showDialog = true;
-          } else if (result.status === 400) {
+          } else if (result.code === 400) {
             localStorage.setItem("token", result.data);
             this.$router.push({path: '/Head/Grade'});
-          } else if (result.status === 100) {
+          } else if (result.code === 404) {
             this.$message({
               type: "warning",
               message: result.message
             });
             this.loading = false;
+          } else {
+            this.$message({
+              type: "warning",
+              message: result.message
+            })
           }
         }).catch((error) => {
           console.log(error);
@@ -161,6 +169,7 @@
         this.showDialog = false;
         this.loading = false;
         this.Student.studentId = "";
+        this.clickAble = false;
         this.time = 3;
         this.Student.password = "";
       },
@@ -168,11 +177,13 @@
         this.showDialog = false;
         this.$router.push({path: "/Head/Answer"});
       },
-      backIndex() {
-        this.$router.push({path: '/Head/Index'});
-      },
-      handleClose(){
+      handleClose() {
         this.loading = true;
+      },
+      calDialogWidth() { //计算dialog的宽度
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? "90%" :
+          /iPhone|iPad|iPod/i.test(navigator.userAgent)
+            ? '70%' : '40%';
       }
     },
     created() {
@@ -183,6 +194,9 @@
           message: "请先登录!"
         })
       }
+      document.removeEventListener("visibilitychange", () => {
+
+      })
     }
   }
 </script>
@@ -191,7 +205,6 @@
 
   .loginDiv {
     position: relative;
-
   }
 
   .form {
@@ -201,35 +214,36 @@
   .form-login {
     padding: 30px 20px 0 20px;
     border: solid #ccc 1px;
-    box-shadow: 5px 5px 5px #ccc;
+    /*box-shadow: 5px 5px 5px #ccc;*/
     border-radius: 5px;
+    background-color: #fff;
   }
 
   .form-login-input {
     margin: 15px auto;
     border-radius: 4px;
     width: 100%;
-    background-color: #545c64;
+    background-color: #409EFF;
     border-color: #ccc;
   }
 
   .index-join-game {
     width: 100%;
     margin: 20px 0;
-    background-color: #545c64;
+    background-color: #409EFF;
     color: white;
   }
 
   .login-head {
     height: 50px;
-    background-color: #545c64;
-    margin-left: -50px;
-    margin-bottom: 15px;
-    color: white;
+    margin-bottom: 35px;
     font-size: 16px;
     line-height: 50px;
-    padding-left: 60px;
-    text-align: left;
+    text-align: center;
+  }
+
+  .login-head span {
+
   }
 
   .back_index {
@@ -240,12 +254,11 @@
   }
 
   .buttons {
-    display: flex;
+    text-align: right;
   }
 
   .button {
     text-align: center;
-    flex: 1;
   }
 
   @media screen and  (max-width: 1000px) {

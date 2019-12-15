@@ -1,122 +1,144 @@
 <template>
   <el-row>
-    <el-col :md="{span:8,offset:8}" :sm="22" :xs="22" :offset="1" style="min-height: 500px;"
-            v-loading="loading">
+    <el-col :md="{span:8,offset:8}" :sm="{span:12,offset:6}" :xs="{span:22,offset:1}" style="background-color:#fff;">
       <!--题目的主体部分-->
-      <div class="question" :md="24" :sm="24" :xs="24" v-show="questionIndex>=0">
-        <div class="game-message">
-          <div class="messageItem wordItem">
-            <p>
-              <i class="el-icon-warning"></i>
-              <span>请勿离开或刷新此页面！</span>
-            </p>
-          </div>
-          <div class="messageItem timeItem" style="padding-top:4px;">
-            <p>
-              <i class="el-icon-loading"></i>
-              <span ref="time" v-text="TIME+'s'"></span>
-            </p>
-          </div>
-        </div>
-        <!--每个题目的部分-->
-        <div style="padding-bottom: 15px;">
-          <div class="question-item">
-            <!--题目的信息-->
-            <div class="question-message">
+      <div v-loading="loading">
+        <div class="question" :md="24" :sm="24" :xs="24" v-show="Config.TOPIC_INDEX>=0">
+          <div class="game-message">
+            <div class="messageItem wordItem">
               <p>
-                <!--题目的序号-->
-                <span class="question-index" v-text="questionIndex+1+'.'"></span>
-                <!--问题的内容-->
-                <span class="question-content" v-text="question.topicText"></span>
+                <i class="el-icon-warning"></i>
+                <span>请勿离开或刷新此页面！</span>
               </p>
             </div>
-            <div class="options">
-              <!--单选部分-->
-              <div v-show="questionType===1" style="padding-left:15px;">
-                <!--答案部分-->
-                <el-radio-group v-model="radio" @change="radioChange">
-                  <div>
-                    <el-radio v-model="radio" label="A" class="question-radio itemText">
-                      {{question.topicOptionA}}
-                    </el-radio>
-                  </div>
-                  <div>
-                    <el-radio v-model="radio" label="B" class="question-radio itemText">
-                      {{question.topicOptionB}}
-                    </el-radio>
-                  </div>
-                  <div>
-                    <el-radio v-model="radio" label="C" class="question-radio itemText">
-                      {{question.topicOptionC}}
-                    </el-radio>
-                  </div>
-                  <div v-show="question.topicOptionD !== null">
-                    <el-radio v-model="radio" label="D" class="question-radio itemText">
-                      {{question.topicOptionD}}
-                    </el-radio>
-                  </div>
-                </el-radio-group>
-              </div>
-              <!--多选部分-->
-              <div v-show="questionType===3" style="padding-left:15px;">
-                <el-checkbox-group v-model="checkbox" @change="checkChange">
-                  <div>
-                    <el-checkbox label="A" class="checkbox-item itemText" v-model="checkbox">
-                      <span class="itemText" v-text="question.topicOptionA"></span>
-                    </el-checkbox>
-                  </div>
-                  <div>
-                    <el-checkbox label="B" class="checkbox-item itemText" v-model="checkbox">
-                      {{question.topicOptionB}}
-                    </el-checkbox>
-                  </div>
-                  <div>
-                    <el-checkbox label="C" class="checkbox-item itemText" v-model="checkbox">
-                      {{question.topicOptionC}}
-                    </el-checkbox>
-                  </div>
-                  <div class="">
-                    <el-checkbox label="D" class="checkbox-item itemText" v-model="checkbox">
-                      {{question.topicOptionD}}
-                    </el-checkbox>
-                  </div>
-                  <div v-show="question.topicOptionE !== null">
-                    <el-checkbox label="E" class="checkbox-item itemText" v-model="checkbox">
-                      {{question.topicOptionE}}
-                    </el-checkbox>
-                  </div>
-                </el-checkbox-group>
-              </div>
-              <!--判断对错部分-->
-              <div v-show="questionType===2" style="padding-left:15px;">
-                <!--答案部分-->
-                <el-radio-group v-model="judge" @change="radioTwoChange">
-                  <div>
-                    <el-radio v-model="judge" label="×" class="question-radio">错</el-radio>
-                  </div>
-                  <div>
-                    <el-radio v-model="judge" label="√" class="question-radio">对</el-radio>
-                  </div>
-                </el-radio-group>
-              </div>
+            <div class="messageItem timeItem" style="padding-top:4px;">
+              <p>
+                <i class="el-icon-loading"></i>
+                <span ref="time" v-text="Config.NOW + ' s'"></span>
+              </p>
             </div>
           </div>
+
+          <!--题目和答案的部分-->
+          <div>
+            <!--每个题目的部分-->
+            <div style="padding-bottom: 15px;">
+              <div class="question-item" v-show="Config.TOPIC_INDEX >= 0 && Config.TOPIC_INDEX <= Config.MAX_TOPIC_NUM">
+                <!--题目的信息-->
+                <div class="question-message">
+                  <p>
+                    <!--题目的序号-->
+                    <span class="question-index" v-text="(Config.TOPIC_INDEX + 1)+'.'"></span>
+                    <!--问题的内容-->
+                    <span class="question-content" v-text="topic.topicText"></span>
+                  </p>
+                </div>
+                <div class="options">
+                  <!--单选部分-->
+                  <div v-show="topic.topicType === 1" style="padding-left:15px;">
+                    <!--答案部分-->
+                    <el-radio-group v-model="RADIO_ANSWER" @change="radioAnswerChange">
+                      <div>
+                        <el-radio label="A" class="question-radio itemText">
+                          {{topic.topicOptionA}}
+                        </el-radio>
+                      </div>
+                      <div>
+                        <el-radio label="B" class="question-radio itemText">
+                          {{topic.topicOptionB}}
+                        </el-radio>
+                      </div>
+                      <div>
+                        <el-radio label="C" class="question-radio itemText">
+                          {{topic.topicOptionC}}
+                        </el-radio>
+                      </div>
+                      <div v-show="topic.topicOptionD !== null">
+                        <el-radio label="D" class="question-radio itemText">
+                          {{topic.topicOptionD}}
+                        </el-radio>
+                      </div>
+                    </el-radio-group>
+                  </div>
+                  <!--多选部分-->
+                  <div v-show="topic.topicType === 3" style="padding-left:15px;">
+                    <el-checkbox-group v-model="MULTIPART_ANSWER" @change="multipartAnswerChange">
+                      <div>
+                        <el-checkbox label="A" class="checkbox-item itemText">
+                          <span class="itemText" v-text="topic.topicOptionA"></span>
+                        </el-checkbox>
+                      </div>
+                      <div>
+                        <el-checkbox label="B" class="checkbox-item itemText">
+                          {{topic.topicOptionB}}
+                        </el-checkbox>
+                      </div>
+                      <div>
+                        <el-checkbox label="C" class="checkbox-item itemText">
+                          {{topic.topicOptionC}}
+                        </el-checkbox>
+                      </div>
+                      <div class="">
+                        <el-checkbox label="D" class="checkbox-item itemText">
+                          {{topic.topicOptionD}}
+                        </el-checkbox>
+                      </div>
+                      <div v-show="topic.topicOptionE !== null">
+                        <el-checkbox label="E" class="checkbox-item itemText">
+                          {{topic.topicOptionE}}
+                        </el-checkbox>
+                      </div>
+                    </el-checkbox-group>
+                  </div>
+                  <!--判断对错部分-->
+                  <div v-show="topic.topicType ===2" style="padding-left:15px;">
+                    <!--答案部分-->
+                    <el-radio-group v-model="JUDGE_ANSWER" @change="judgeAnswerChange">
+                      <div>
+                        <el-radio label="×" class="question-radio">错</el-radio>
+                      </div>
+                      <div>
+                        <el-radio label="√" class="question-radio">对</el-radio>
+                      </div>
+                    </el-radio-group>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!--题目的父类-->
+            <!--题目的控制部分-->
+            <div class="question-buttons">
+              <div class="question-button">
+                <el-button type="primary" size="medium" @click="prevTopic">上一题</el-button>
+              </div>
+              <div class="question-button" v-show="Config.TOPIC_INDEX < Config.MAX_TOPIC_NUM - 1">
+                <el-button type="warning" size="medium" @click="nextTopic">下一题</el-button>
+              </div>
+              <div class="question-button" v-show="Config.TOPIC_INDEX  >= Config.MAX_TOPIC_NUM - 1">
+                <el-button type="success" size="medium" @click="confirmSubmit">提交答案</el-button>
+              </div>
+            </div>
+
+          </div>
         </div>
-        <!--题目的父类-->
-        <!--题目的控制部分-->
-        <div class="question-buttons">
-          <div class="question-button">
-            <el-button type="primary" size="medium" @click="lastQuestion">上一题</el-button>
-          </div>
-          <div class="question-button" v-show="questionIndex < MAX_TOPIC - 1">
-            <el-button type="warning" size="medium" @click="nextQuestion">下一题</el-button>
-          </div>
-          <div class="question-button" v-show="questionIndex === MAX_TOPIC -1">
-            <el-button type="success" size="medium" @click="confirmSubmit">提交答案</el-button>
-          </div>
-        </div>
+
       </div>
     </el-col>
+
+
+    <el-dialog
+      title="提示"
+      :visible.sync="showSubmitDialog"
+      :width="calDialogWidth()">
+      <div>
+        确认提交答案？
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="showSubmitDialog = false">取 消</el-button>
+        <el-button type="primary" @click="submitAnswer">确 定</el-button>
+      </div>
+    </el-dialog>
 
 
   </el-row>
@@ -130,232 +152,93 @@
     name: "answer",
     data() {
       return {
-        radio: 'A',//单选按钮的值
-        checkbox: ['A'],//多选按钮的值
-        judge: "√",
+        RADIO_ANSWER: 'A',//单选按钮的值
+        MULTIPART_ANSWER: ['A'],//多选按钮的值
+        JUDGE_ANSWER: "√",
         loading: true,
-        questionType: 0,//正在显示的题目的类型
-        questionIndex: -1,//正在显示的题号
-        questionArray: [],//存储题号的数组
-        questions: [//问题的数组
+        topics: [//问题的数组
 
         ],
-        question: {
+        topic: {
           topicText: '',
+          topicType: 1,
           topicOptionA: '',
           topicOptionB: '',
           topicOptionC: '',
           topicOptionD: '',
-          topicOptionE: ''
+          topicOptionE: '',
+          topicAnswer: []
         }, // 当前的问题
-        answers: [//存储答案的部分
-
-        ],
-        TIME: 3600,//答题的时间
-        time: null,//答题计时器
-        id: null,
-        token: '',
-        MAX_TOPIC: 80,
-        changePage: false
+        Config: {
+          MAX_TIME: 3600,
+          NOW: 3600,
+          MAX_TOPIC_NUM: 80,
+          TOPIC_INDEX: -1
+        },
+        TOKEN: null,
+        showSubmitDialog: false,
+        Interval: null
       }
     },
     methods: {
-      radioChange(val) {//单选按钮的值点击事件
-        this.radio = val;
-        this.answers[this.questionIndex] = this.radio;
+      radioAnswerChange(val) {
+        this.topics[this.Config.TOPIC_INDEX].topicAnswer = val;
       },
-      checkChange(val) {//多选按钮的值点击事件
-        if(val.length !== 0){
-          this.checkbox = val;
-          this.answers[this.questionIndex] = this.checkbox;
-        }else{
-          this.checkbox = ['A'];
-          this.answers[this.questionIndex] = this.checkbox;
+      multipartAnswerChange(val) {
+        this.topics[this.Config.TOPIC_INDEX].topicAnswer = val;
+      },
+      judgeAnswerChange(val) {
+        this.topics[this.Config.TOPIC_INDEX].topicAnswer = val;
+      },
+      prevTopic() {
+        if (this.Config.TOPIC_INDEX > 0) {
+          this.storageAnswer();
+          this.Config.TOPIC_INDEX--;
+          this.topic = this.topics[this.Config.TOPIC_INDEX];
+          this.setAnswer();
         }
       },
-      radioTwoChange(val) {//判断题答案改变事件
-        this.judge = val;
-        this.answers[this.questionIndex] = this.judge;
-      },
-      nextQuestion() {//下一个问题的入口
-        //存储答案
-        if (this.questionType === 1) {
-          this.answers[this.questionIndex] = this.radio;
-          this.radio = 'A';
-        } else if (this.questionType === 3) {
-          //判断多选题的答案
-          if (this.checkbox.length === 0) { // 多选题没选答案
-            this.answers[this.questionIndex] = ['Z'];
+      nextTopic() {
+        if (this.Config.TOPIC_INDEX < this.Config.MAX_TOPIC_NUM) {
+          this.storageAnswer();
+          if (this.Config.TOPIC_INDEX < this.topics.length - 1) {
+            this.Config.TOPIC_INDEX++;
+            this.topic = this.topics[this.Config.TOPIC_INDEX];
+            this.setAnswer();
           } else {
-            this.answers[this.questionIndex] = this.checkbox;
+            this.loadTopic();
           }
-          this.checkbox = ['A'];
-        } else if (this.questionType === 2) {
-          this.answers[this.questionIndex] = this.judge;
-          this.judge = "√";
-        }
-        if (this.questionIndex < this.MAX_TOPIC) {
-          //加载下一题的题目
-          if (this.questionIndex < this.questions.length - 1) {  //如果下一题的的下表小于已经加载的题号
-            this.question = this.questions[++this.questionIndex];
-            this.questionType = this.question.topicType;
-            //匹配选中的值
-            if (this.questionType === 1) {//单选
-              this.radio = this.answers[this.questionIndex];
-            } else if (this.questionType === 3) {//多选
-              this.checkbox = this.answers[this.questionIndex];
-            } else if (this.questionType === 2) {//判断
-              this.judge = this.answers[this.questionIndex];
-            }
-            return;
-          }
-          this.loadNextQuestion(this.questionIndex + 2);
         }
       },
-      confirmSubmit() {//确认提交事件
-        //先保存答案
-        if (this.questionType === 1) {//单选
-          this.answers[this.questionIndex] = this.radio;
-        } else if (this.questionType === 3) {//多选
-          this.answers[this.questionIndex] = this.checkbox;
-        } else if (this.questionType === 2) {//判断
-          this.answers[this.questionIndex] = this.judge;
-        }
-
-        this.$confirm("确认提交答案？").then(() => {
-          this.submitAnswer();
-        }).catch(() => {
-          this.$message({
-            type: "warning",
-            message: "已取消提交"
-          });
-        })
+      confirmSubmit() {
+        this.storageAnswer();
+        this.showSubmitDialog = true;
       },
-      loadNextQuestion(index) {//获得下一个问题   如果学生已经有了成绩 就会直接返回到成绩页面
+      loadTopic() {
         this.loading = true;
-        axios.get("/Topic/getTopic", {
+        axios.get(this.$URL.LoadTopic, {
           params: {
-            token: this.token,
-            topicIndex: index
-          }
-        }).then((success) => {
-          let result = success.data;
-          //跳转页面
-          if (result.result) { // 获取题目成功
-            //获取题目的数据
-            this.questionType = result.data.topicType;//设置题目的类型
-            this.questions.push(result.data);
-            this.question = result.data;
-            this.questionArray.push(result.data.topicId);
-            this.questionIndex++;
-            //更新值
-            if (this.questionType === 1) {//单选
-              this.radio = 'A';
-            } else if (this.questionType === 3) {//多选
-              this.checkbox = ['A']
-            } else if (this.questionType === 2) {//判断
-              this.judge = '√';
-            }
-            this.loading = false;
-          } else {
-            if (result.message === "用户不存在") {
-              this.$router.push({path: "/Head/Login"});
-            } else if (result.message === "已经作答") {
-              this.$router.push({path: "/Head/Grade"});
-            }
-          }
-        }).catch((error) => {
-          console.log(error);
-          this.$message({
-            type: 'error',
-            message: "请求失败"
-          });
-          this.loading = false;
-        })
-      },
-      lastQuestion() {//上一个问题的显示
-        this.loading = true;
-        //临界值的判断
-        if (this.questionIndex > 0) {
-          //先保存值
-          if (this.questionType === 1) {//单选
-            this.answers[this.questionIndex] = this.radio;
-          } else if (this.questionType === 3) {//多选
-            this.answers[this.questionIndex] = this.checkbox;
-          } else if (this.questionType === 2) {//判断
-            this.answers[this.questionIndex] = this.judge;
-          }
-          //开跳转到下一个问题
-          this.question = this.questions[--this.questionIndex];
-          this.questionType = this.question.topicType;
-          console.log(this.questionIndex);
-          //修改选中的值
-          if (this.questionType === 1) {//单选
-            this.radio = this.answers[this.questionIndex];
-          } else if (this.questionType === 3) {//多选
-            this.checkbox = this.answers[this.questionIndex];
-          } else if (this.questionType === 2) {//判断
-            this.judge = this.answers[this.questionIndex];
-          }
-        } else {
-          this.$message({
-            type: 'warning',
-            message: "当前已经是最后一题了"
-          });
-        }
-        this.loading = false;
-      },
-      submitAnswer() {//提交答案
-        //开始提交答案
-        this.loading = true;
-        window.clearInterval(this.time);
-        let radioAnswer = "";
-        let multipartAnswer = "";
-        let judgeAnswer = "";
-        //根据回答了多少题获取答案
-        for (let i = 0; i < this.answers.length; i++) {
-          if (i < 40) {
-            radioAnswer += (this.questionArray[i] + "" + this.answers[i]);
-          } else if (i < 60) {
-            multipartAnswer += (this.questionArray[i] + "" + (this.answers[i].toString().replace(/,/g, "")));
-          } else if (i < 80) {
-            judgeAnswer += (this.questionArray[i] + "" + this.answers[i]);
-          }
-        }
-        if(radioAnswer === "" && multipartAnswer === "" && judgeAnswer === ""){
-          return;
-        }
-        //清空答案
-        this.questionArray = [];
-        this.answers = [];
-        //发送请求计算分数
-        axios.get("/Topic/calScore", {
-          params: {
-            token: this.token,
-            radioAnswer: radioAnswer,
-            multipartAnswer: multipartAnswer,
-            judgeAnswer: judgeAnswer
+            topicIndex: this.Config.TOPIC_INDEX + 2, // -1 + 2 = 1 第一题
+            token: this.TOKEN
           }
         }).then((success) => {
           let res = success.data;
-          if (res.result && res.status === 200) {
-            this.$message({
-              type: "success",
-              message: res.message
-            });
-            setTimeout(() => {
-              this.$router.push({path: "/Head/Grade"});
-            }, 1000);
-            this.loading = false;
+          if (res.result) {
+            this.topics.push(res.data);
+            this.Config.TOPIC_INDEX++;
+            this.topic = res.data;
+            //重置答案
+            this.resetAnswer();
           } else {
             this.$message({
               type: "warning",
               message: res.message
             });
-            setTimeout(() => {
-              this.$router.push({path: "/Head/Login"})
-            }, 1000);
+            if (res.code === 400) {
+              this.$router.push({path: "/Head/Grade"});
+            }
           }
+          this.loading = false;
         }).catch((error) => {
           console.log(error);
           this.$message({
@@ -363,110 +246,191 @@
             message: "请求异常"
           });
           this.loading = false;
-        });
+        })
+
       },
-      calTime() {//计算时间
-        let t = parseInt(this.TIME);
-        let span = this.$refs["time"];
-        if (this.time != null) {
-          window.clearInterval(this.time);
-          span.innerHTML = 0 + "s";
-          //提交答案
+      submitAnswer() {
+        this.loading = true;
+        if (this.topics === undefined || this.topics.length === 0) {
           return;
         }
-        let self = this;
-        let flag = true;
-        this.time = window.setInterval(function () {
-          t--;
-          span.innerHTML = t + "s";
-          if (t < 1) {
-            //提交答案
-            //清除token
-            console.log("time in");
-            console.log(t);
-            if (flag) {
-              self.submitAnswer();
-              flag = false;
-              window.clearInterval(self.time);
-            }
+        let judgeAnswer = "";
+        let radioAnswer = "";
+        let multipartAnswer = "";
+        //封装答案
+        for (let t of this.topics) {
+          switch (t.topicType) {
+            case 1:
+              radioAnswer += (t.topicId + t.topicAnswer);
+              break;
+            case 2:
+              judgeAnswer += (t.topicId + t.topicAnswer);
+              break;
+            case 3:
+              multipartAnswer += (t.topicId + t.topicAnswer.toString().replace("[", "").replace("]", "").replace(/,/g, ""));
+              break;
+            default:
+              break;
           }
-        }, 1000);
+        }
+        //开始提交数据
+        //清楚定时器
+        window.clearInterval(this.Interval);
+        axios.get(this.$URL.CalAnswer, {
+          params: {
+            radioAnswer: radioAnswer.trim(),
+            judgeAnswer: judgeAnswer.trim(),
+            multipartAnswer: multipartAnswer.trim(),
+            token: this.TOKEN
+          }
+        }).then((success) => {
+          let res = success.data;
+          if (res.result) {
+            this.$message({
+              type: "success",
+              message: "提交成功"
+            });
+            //清除答案数据
+            localStorage.removeItem("TIME");
+            localStorage.removeItem("Answer");
+            //取消注册事件
+            document.removeEventListener("visibilitychange", function () {
+
+            });
+            this.$router.push({path: "/Head/Grade"});
+          } else {
+            //不是重复提交  是重复提交就隐藏掉消息
+            if (res.message !== "你本次已经答题完成") {
+              this.$message({
+                type: "warning",
+                message: res.message
+              });
+              setTimeout(() => {
+                this.$router.push({path: "/Head/Login"});
+              }, 1000);
+            } else {
+              console.log("重复提交隐藏数据");
+            }
+
+            this.showSubmitDialog = false;
+          }
+        }).catch((error) => {
+          console.log(error);
+          this.$message({
+            type: "error",
+            message: "请求异常"
+          });
+          this.showSubmitDialog = false;
+          this.loading = false;
+        })
+      },
+      startCalTime() {
+        let that = this;
+        this.Interval = setInterval(() => {
+          that.Config.NOW--;
+          if (this.Config.NOW <= 0) {
+            //提交数据
+            this.storageAnswer();
+            this.submitAnswer();
+            window.clearInterval(that.Interval);
+          }
+        }, 1000)
+      },
+      storageAnswer() {
+        switch (this.topic.topicType) {
+          case 1:
+            this.topics[this.Config.TOPIC_INDEX].topicAnswer = this.RADIO_ANSWER;
+            break;
+          case 2:
+            this.topics[this.Config.TOPIC_INDEX].topicAnswer = this.JUDGE_ANSWER;
+            break;
+          case 3:
+            this.topics[this.Config.TOPIC_INDEX].topicAnswer = this.MULTIPART_ANSWER;
+            break;
+          default:
+            break;
+        }
+      },
+      resetAnswer() {
+        switch (this.topic.topicType) {
+          case 1:
+            this.RADIO_ANSWER = 'A';
+            break;
+          case 2:
+            this.JUDGE_ANSWER = '×';
+            break;
+          case 3:
+            this.MULTIPART_ANSWER = ['A'];
+            break;
+          default:
+            break;
+        }
+      },
+      setAnswer() {
+        switch (this.topic.topicType) {
+          case 1:
+            this.RADIO_ANSWER = this.topic.topicAnswer;
+            break;
+          case 2:
+            this.JUDGE_ANSWER = this.topic.topicAnswer;
+            break;
+          case 3:
+            this.MULTIPART_ANSWER = this.topic.topicAnswer;
+            break;
+          default:
+            break;
+        }
+      },
+      calDialogWidth() {
+        return /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent) ? "90%" : "30%";
       }
     },
-    created() {//创建实例时
-      this.token = localStorage.getItem("token");
-      if (this.token == null) {
-        this.$router.push({path: '/Head/Login'});
-        return
-      }
-      this.loadNextQuestion(1);
-
-
-      let self = this;
-      let submit = false;
-
-
-      //注册页面的刷新事件
-      window.addEventListener("beforeunload", function () {
-        //页面刷新时先保存答案
-        if (self.questionType === 0) {//单选
-          self.answers[self.questionIndex] = self.radio;
-        } else if (self.questionType === 1) {//多选
-          self.answers[self.questionIndex] = self.checkbox;
-        } else if (self.questionType === 2) {//判断
-          self.answers[self.questionIndex] = self.judge;
+    created() {
+      this.TOKEN = localStorage.getItem("token");
+      if (this.TOKEN == null || this.TOKEN === undefined) {
+        this.$route.push({path: "/Head/Login"});
+      } else {
+        let time = localStorage.getItem("TIME");
+        if (time != null) {
+          this.loading = true;
+          this.topics = JSON.parse(localStorage.getItem("Answer"));
+          this.Config.NOW = time;
+          this.submitAnswer();
+          localStorage.removeItem("TIME");
+          localStorage.removeItem("Answer");
+          return;
         }
-        //提交答案
-        if (!submit) {
-          self.submitAnswer();
-          window.clearInterval(self.time);
-          submit = false;
+        this.loadTopic();
+        this.startCalTime();
+      }
+
+      let that = this;
+
+
+      window.onbeforeunload = () => {
+        that.storageAnswer();
+        localStorage.setItem("TIME", that.Config.NOW);
+        localStorage.setItem("Answer", JSON.stringify(that.topics));
+        return "确认离开当前页面? 这将触发自动提交！";
+      };
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          // 页面被挂起
+          that.storageAnswer();
+          if (localStorage.getItem("SUBMIT") == null) {
+            localStorage.setItem("SUBMIT", "200");
+            document.removeEventListener("visibilitychange", function () {
+
+            });
+            that.submitAnswer();
+          }
+        }
+        else {
+          // 页面呼出
         }
       });
 
-      function removeBack() {
-
-      }
-
-      function remove() {
-        // 用户离开了当前页面
-        if (document.visibilityState === 'hidden') {
-          submit = true;
-          if (this.questionType === 0) {//单选
-            self.answers[self.questionIndex] = self.radio;
-          } else if (self.questionType === 1) {//多选
-            self.answers[self.questionIndex] = self.checkbox;
-          } else if (self.questionType === 2) {//判断
-            self.answers[self.questionIndex] = self.judge;
-          }
-        }
-        // 用户打开或回到页面
-        if (document.visibilityState === 'visible') {
-          // document.title = '页面可见';
-          if (submit) {
-            //数据不一致
-            if (this.answers === undefined || this.questionArray === undefined ||
-              this.answers.length === 0 || this.questionArray.length === 0 ||
-              this.answers.length !== this.questionArray.length) {
-              return;
-            }
-            self.submitAnswer();
-            window.clearInterval(self.time);
-            //清除事件
-            document.removeEventListener("visibilitychange", removeBack);
-          }
-        }
-      }
-
-      //页面切换的事件
-      document.addEventListener('visibilitychange', remove);
-    },
-    beforeUpdate() {
-    },
-    mounted() {//渲染完成时
-      this.loading = false;
-      //计算时间
-      this.calTime();
     },
     beforeDestroy() {//销毁示例时
     }
@@ -479,7 +443,7 @@
     background-color: #fff;
     border-radius: 5px;
     border: solid #ccc 1px;
-    margin: 150px 0 150px 0;
+    margin: 30% 0 0 0;
     min-height: 260px;
     padding-bottom: 20px;
   }
@@ -491,7 +455,6 @@
     padding: 7px 0;
     font-size: 24px;
   }
-
 
   span {
     text-overflow: ellipsis;
@@ -530,7 +493,6 @@
     flex: 1;
   }
 
-
   .question-buttons {
     border-top: solid 1px #ccc;
     padding-top: 20px;
@@ -541,7 +503,7 @@
 
   .question-button {
     text-align: center;
-    flex: 1;
+    flex: 0.5;
     padding: 0 10%;
   }
 
@@ -551,13 +513,12 @@
   }
 
   .checkbox-item {
-    margin: 7px 0;
+    margin: 0;
     outline: none;
     text-overflow: ellipsis;
     white-space: normal;
-    line-height: 30px;
+    line-height: 25px;
   }
-
 
   .itemText {
     word-wrap: break-word;
